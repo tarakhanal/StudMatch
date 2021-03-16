@@ -1,0 +1,26 @@
+
+:root {
+  --primary-color: #2B839D;
+  --primary-background-color: #ffffff;
+  --interests-color: #389D13;
+  --primary-font: museo, serif;
+}
+
+.disabledElement {
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: initial;
+}
+
+.errorToastNotification {
+  background-color: white !important;
+}
+
+.errorToastBody {
+  color: black;
+  font-family: var(--primary-font);
+}
+
+.errorToastProgressBar {
+  background: var(--primary-color) !important; 
+}
