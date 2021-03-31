@@ -6,11 +6,8 @@ import MDSpinner from 'react-md-spinner'
 
 export default class LoginPage extends Component {
     constructor() {
-        // super is always called at the beginning of our constructor. This executes our constructor when the
-        // class is instantiated - instantiating our state accordingly.
         super()
-        // state can be thought of as member fields. State is managed by react and react will automatically
-        // re-render the appropriate DOM elements when our state changes
+
         this.state = {
             formDisplay: 'login',
             email: '',
@@ -22,27 +19,33 @@ export default class LoginPage extends Component {
             fetchingForgotPassword: false,
             fetchingCreateAccount: false,
         }
-        //NOTE: ~NEVER~ manipulate state directly (i.e this.state.email = 'Joseph@email.com')
-        //We always use the this.setState({email: 'Joseph@email.com'}) method to update state so react is
-        //aware of state changes.
     }
 
-
-    //Form submissions automatically refresh the page on submit. We use event.preventDefault() to stop this
-
-    fetchLogin = (event) => {
+    fetchLogin = async (event) => {
         event.preventDefault()
         this.setState({fetchingLogin: true})
-        {
-            //Simulate fetch
-            setTimeout(() => {
+
+        await fetch(`http://localhost:4000/api/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({email: this.state.email, password: this.state.password})
+        })
+        .then((response) => {
+            if (response.ok) {
+                this.props.displayMessageHandler('Successfully Logged In')
                 this.setState({fetchingLogin: false})
-            }, 2000)
-        }
-        //Fetch login token - probably going to handle this in App.js so we'll do something like:
+            } else
+                throw new Error('Invalid login info')
+        })
+        .catch((error) => {
+            console.log(error)
+            this.props.displayMessageHandler(error)
+            this.setState({fetchingLogin: false})
+        })
+
         this.props.fetchLogin(this.state.email, this.state.password)
-        //This will call a function in App.js which we pass in props. Take a look at the <LoginPage> properties in App.js
-        //To see how this is referenced
     }
 
     fetchForgotPassword = (event) => {
@@ -58,39 +61,44 @@ export default class LoginPage extends Component {
         //Fetch forgot password
     }
 
-    fetchCreateAccount = (event) => {
+    fetchCreateAccount = async (event) => {
         event.preventDefault()
         this.setState({fetchingCreateAccount: true})
         if (this.state.createPassword === this.state.createConfirmPassword) {
-            {
-                //Simulate fetch
-                setTimeout(() => {
-                    let newEmail = this.state.createEmail
-                    this.setState({fetchingCreateAccount: false, formDisplay: 'login', createConfirmPassword: '', createEmail: '', email: newEmail, createPassword: ''})
-                    this.props.displayMessageHandler('Account created successfully')
-                }, 2000)
-            }
+
             //Fetch account creation
+            await fetch(`http://localhost:4000/api/createAccount`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({email: this.state.createEmail, password: this.state.createPassword})
+            })
+            .then((response) => {
+                if (response.ok) {
+                    this.props.displayMessageHandler('Successfully Created Account')
+                    this.setState({fetchingCreateAccount: false, formDisplay: 'login', createEmail: '', createPassword: '', createConfirmPassword: ''})
+                } else
+                    throw new Error('Failed to create account')
+            })
+            .catch((error) => {
+                console.log(error)
+                this.props.displayMessageHandler(error)
+                this.setState({fetchingCreateAccount: false})
+            })
+
         } else {
             this.setState({fetchingCreateAccount: false})
             this.props.displayMessageHandler('Passwords don\'t match')
         }
     }
 
-    // Render function always exists in a class component. Render is called to render the appropriate DOM objects
-    // the return value is what will be rendered. We can put free functions in render but generally
-    // we just associate the methods with our class and reference them as such. Honestly I have no idea why lmao
     render() {
         return (
             <div className='loginPageContainer'>
                 <div className='loginContentWrapper'>
                     <h1 className='loginLogoText'>StudyPartner</h1>
-                    {/* Animate Presence allows us to use framer motion - our animation library */}
-                    {/*
-                        exitBeforeEnter indicates the new components shouldn't render until the previous has finished its animation
-                    */}
                     <AnimatePresence exitBeforeEnter >
-                        {/* Utilizing a ternary expression to conditionally render content depending on the state of "formDisplay" */}
                         {this.state.formDisplay === 'login' ?
                             <motion.form key='loginContainer' className='loginInformationContainer' onSubmit={this.fetchLogin} initial={loginContainerTransition.initial} animate={loginContainerTransition.in} exit={loginContainerTransition.out} transition={{ duration: loginContainerTransitionDuration }}>
                                 <label for='loginEmailInput' className='loginInputTitle'>Email</label>

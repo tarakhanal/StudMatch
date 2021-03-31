@@ -12,9 +12,6 @@ class App extends Component {
     }
   }
 
-  //We call fetchlogin in app.js so we can reference the user object throughout our app.
-  //Alternatively we could fetch the auth token in LoginPage.js and pass it to this component
-  //but I think it makes more sense to make the call here.
   fetchLogin = (email, password) => {
 
   }
