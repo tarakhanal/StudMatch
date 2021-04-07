@@ -1,0 +1,201 @@
+
+
+.appContainer {
+    height: 100vh;
+    width: 100%;
+    display: grid;
+    grid-template-rows: 60px auto;
+    grid-template-columns: 1fr 1fr;
+    background: linear-gradient(to bottom, var(--primary-background-color), var(--primary-color));
+}
+
+.appTitleContainer {
+    grid-column: span 2;
+    background-color: var(--primary-background-color);
+    width: fit-content;
+    padding: 0px 15px;
+    padding-right: 25px;
+    border-radius: 0px 0px 90px 0px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+    display: grid;
+}
+
+.appTitleLogoText {
+    color: var(--primary-color);
+    font-family: var(--primary-font);
+    margin: 10px 0px;
+    font-size: 26px;
+    align-self: center;
+}
+
+.profileDisplayContainer {
+    background-color: var(--primary-background-color);
+    width: calc(90% - 50px);
+    justify-self: center;
+    margin-top: 25px;
+    height: calc(100% - 100px);
+    border-radius: 10px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+    padding: 25px 25px;
+}
+
+.profileDisplayContentWrapper {
+    margin-top: 30px;
+}
+
+.largeProfilePhoto {
+    border-radius: 100%;
+    height: 150px;
+    width: 150px;
+    object-fit: cover;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+    margin-bottom: 15px;
+}
+
+.headerText {
+    margin: 0px;
+    font-family: var(--primary-font);
+    color: var(--primary-color);
+    text-align: center;
+}
+
+.bodyText {
+    margin: 0px;
+    margin-bottom: 20px;
+    font-family: var(--primary-font);
+    font-size: 20px;
+    text-align: center;
+    font-weight: 300;
+}
+
+.profileInfoTitle {
+    margin: 0px;
+    font-family: var(--primary-font);
+    text-align: center;
+    font-size: 14px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.badgeWrapper {
+    position: relative;
+    left: 50%;
+    width: fit-content;
+    transform: translateX(-50%);
+    margin-bottom: 20px;
+}
+
+.skillsBadge {
+    font-family: var(--primary-font);
+    background-color: var(--primary-color);
+    color: white;
+    margin-right: 10px;
+    padding: 3px 9px;
+    border-radius: 3px;
+    font-weight: 300;
+}
+
+.interestsBadge {
+    font-family: var(--primary-font);
+    background-color: #389D13;
+    color: white;
+    margin-right: 10px;
+    padding: 3px 9px;
+    border-radius: 3px;
+    font-weight: 300;
+}
+
+.profileDescriptionText {
+    font-family: var(--primary-font);
+    margin: 0px;
+    font-weight: 300;
+}
+
+.appNavigationContainer {
+    background-color: var(--primary-background-color);
+    width: calc(90% - 0px);
+    justify-self: center;
+    margin-top: 25px;
+    height: calc(100% - 25px);
+    border-radius: 10px 10px 0px 0px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+    display: grid;
+    grid-template-rows: 50px auto;
+}
+
+.appNavigationButtonWrapper {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    border-bottom: 1px solid #9B9B9B;
+}
+
+.appNavigationButton {
+    cursor: pointer;
+    border: 0px;
+    background-color: var(--primary-background-color);
+    color: var(--primary-color);
+    border-right: 1px solid #9B9B9B;
+    font-size: 28px;
+}
+
+.appNavigationButtonSelected {
+    color: white;
+    background-color: var(--primary-color);
+    border: 0px;
+}
+
+.appNavigationButton:focus, .appNavigationButtonSelected:focus {
+    outline: none;
+}
+
+.appNavigationButton:nth-child(1) {
+    border-radius: 10px 0px 0px 0px;
+}
+
+.appNavigationButton:nth-last-child(1) {
+    border: 0px;
+    border-radius: 0px 10px 0px 0px;
+}
+
+.findMatchesContainer {
+    display: grid;
+    grid-template-rows: auto 70px;
+    height: 100%;
+    padding: 0px 10px;
+}
+
+.profileWrapper {
+    align-self: center;
+}
+
+.rateUserButtonWrapper {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 10px;
+    margin-bottom: 10px;
+}
+
+.likeButton, .dislikeButton {
+    cursor: pointer;
+    border: 0px;
+    color: white;
+    font-size: 24px;
+    font-family: var(--primary-font);
+    font-weight: 300;
+    height: 60px;
+}
+
+.likeButton {
+    font-family: var(--primary-font);
+    background-color: #66D691;
+}
+
+.dislikeButton {
+    font-family: var(--primary-font);
+    background-color: #C95858;
+}

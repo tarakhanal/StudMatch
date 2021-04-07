@@ -3,6 +3,7 @@ import './App.css';
 import LoginPage from './Components/LoginPage/LoginPage';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AppContainer from './Components/AppContainer/AppContainer';
 
 class App extends Component {
   constructor() {
@@ -12,8 +13,8 @@ class App extends Component {
     }
   }
 
-  fetchLogin = (email, password) => {
-
+  fetchLogin = (email) => {
+    this.setState({user: {email}})
   }
 
   // toast notifications from package react-toastify
@@ -29,9 +30,9 @@ class App extends Component {
     return (
       <div className="App">
         {this.state.user ?
-          <div>
-
-          </div>
+          <AppContainer
+            logoutHandler={() => this.setState({user: null})}
+          />
         :
           <LoginPage
             fetchLogin={this.fetchLogin}

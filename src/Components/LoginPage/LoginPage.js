@@ -34,8 +34,8 @@ export default class LoginPage extends Component {
         })
         .then((response) => {
             if (response.ok) {
-                this.props.displayMessageHandler('Successfully Logged In')
                 this.setState({fetchingLogin: false})
+                this.props.fetchLogin(this.state.email)
             } else
                 throw new Error('Invalid login info')
         })
@@ -44,8 +44,6 @@ export default class LoginPage extends Component {
             this.props.displayMessageHandler(error)
             this.setState({fetchingLogin: false})
         })
-
-        this.props.fetchLogin(this.state.email, this.state.password)
     }
 
     fetchForgotPassword = (event) => {
@@ -123,6 +121,7 @@ export default class LoginPage extends Component {
                                 <p className='forgotPasswordInfoText'>Forgot your password? Enter your email and you'll receive a link to reset.</p>
                                 <label for='loginEmailInput' className='loginInputTitle'>Email</label>
                                 <input type='email' value={this.state.email} onChange={(e) => this.setState({email: e.target.value})} id='loginEmailInput' className='loginInput' />
+                                
                                 {this.state.fetchingForgotPassword ?
                                     <div className='loadingSpinnerContainer'>
                                         <MDSpinner size={30} singleColor={'#2B839D'}/>
@@ -133,6 +132,7 @@ export default class LoginPage extends Component {
                                         <button className='loginPrimaryButton' type='submit'>Submit</button>
                                     </div>
                                 }
+
                             </motion.form>
                         :
                             <motion.form key='signUpContainer' className='loginInformationContainer' onSubmit={this.fetchCreateAccount} initial={loginContainerTransition.initial} animate={loginContainerTransition.in} exit={loginContainerTransition.out} transition={{ duration: loginContainerTransitionDuration }}>
@@ -156,6 +156,7 @@ export default class LoginPage extends Component {
                                 }
                             </motion.form>
                         }
+
                     </AnimatePresence>
                 </div>
             </div>
