@@ -10,18 +10,6 @@ const uri =
 // Create a new MongoClient
 const client = new MongoClient(uri);
 
-async function run() {
-  try {
-    // Connect the client to the server
-    await client.connect();
-    // Establish and verify connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Connected successfully to server");
-  } finally {
-    // await client.close();
-  }
-}
-
 const app = express()
 
 app.use(express.json())
@@ -76,3 +64,50 @@ app.post('/api/login', async (req, res) => {
   }
   res.status(200).end()
 })
+
+app.post('/api/login/more-info', async (req, res) => {
+  try {
+      const user = {
+      firstName: "Tara",
+      lastName: "Khanal",
+      email: "tara@test.com",
+      password: "pwd123",
+      major: "Computer Sciecne",
+      school: "The University of Akron",
+      skills: [ "Hiking", "Video Games", "Painting", "Snowboarding", "Basketball" ],
+      profilePicture: "https://via.placeholder.com/150",
+      aboutMe: "My name is Tara"
+      };
+
+      await client.connect();
+
+      const database = client.db("test");
+      const users = database.collection("users");
+
+      const result = await users.insertOne(user);
+
+      console.log(`${result.insertedCount} documents were inserted with the _id: ${result.insertedId}`);
+      console.log("User info is successfully stored!");
+      } finally {
+      await client.close();
+  }
+});
+
+app.get("/userInfo", async (req, res) => {
+
+  try{
+      await client.connect();
+      const database = client.db("test");
+      const users = database.collection("users");
+      const cursor = users.find();
+  
+      // prints each field in the console
+      cursor.forEach((doc, err) =>{
+          console.log(doc);
+      });
+      res.send(`Your info: ${cursor}`);
+
+  } finally {
+      await client.close();
+  }
+});
