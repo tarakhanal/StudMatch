@@ -27,6 +27,7 @@ export default class LoginPage extends Component {
             aboutSection: '',
             fetchingSubmitAccountDetails: false,
             profilePhoto: '',
+            profilePhotoPreview: '',
         }
     }
 
@@ -49,7 +50,6 @@ export default class LoginPage extends Component {
                 throw new Error('Invalid login info')
         })
         .then((response) => {
-            console.log(JSON.parse(response))
             this.props.fetchLogin(JSON.parse(response))
         })
         .catch((error) => {
@@ -213,16 +213,16 @@ export default class LoginPage extends Component {
                         : this.state.formDisplay === 'userInformation' ?
                             <motion.form key='userInformationContainer' className='loginInformationContainer' onSubmit={this.submitUserInfo} initial={loginContainerTransition.initial} animate={loginContainerTransition.in} exit={loginContainerTransition.out} transition={{ duration: loginContainerTransitionDuration }}>
                                 <label for='firstName' className='loginInputTitle'>First Name</label>
-                                <input type='text' value={this.state.firstName} onChange={(e) => this.setState({firstName: e.target.value})} id='firstName' className='loginInput' />
+                                <input type='text' required value={this.state.firstName} onChange={(e) => this.setState({firstName: e.target.value})} id='firstName' className='loginInput' />
                                 <br />
                                 <label for='lastName' className='loginInputTitle'>Last Name</label>
-                                <input type='text' value={this.state.lastName} onChange={(e) => this.setState({lastName: e.target.value})} id='lastName' className='loginInput' />
+                                <input type='text' required value={this.state.lastName} onChange={(e) => this.setState({lastName: e.target.value})} id='lastName' className='loginInput' />
                                 <br />
                                 <label for='major' className='loginInputTitle'>Major</label>
-                                <input type='text' value={this.state.major} onChange={(e) => this.setState({major: e.target.value})} id='major' className='loginInput' />
+                                <input type='text' required value={this.state.major} onChange={(e) => this.setState({major: e.target.value})} id='major' className='loginInput' />
                                 <br />
                                 <label for='school' className='loginInputTitle'>School</label>
-                                <input type='text' value={this.state.school} onChange={(e) => this.setState({school: e.target.value})} id='school' className='loginInput' />
+                                <input type='text' required value={this.state.school} onChange={(e) => this.setState({school: e.target.value})} id='school' className='loginInput' />
                                 <br />
                                 <div className='loginSubmitButtonWrapper'>
                                     <button className='loginSecondaryButton' type='button' onClick={() => this.setState({formDisplay: 'login'})}>Cancel</button>
@@ -232,10 +232,10 @@ export default class LoginPage extends Component {
                         :
                             <motion.form key='accountInfoContainer' className='loginInformationContainer' onSubmit={this.submitAccountDetails} initial={loginContainerTransition.initial} animate={loginContainerTransition.in} exit={loginContainerTransition.out} transition={{ duration: loginContainerTransitionDuration }}>
                                 <label for='skills' className='loginInputTitle'>Skills</label>
-                                <input type='text' value={this.state.skills} onChange={(e) => this.setState({skills: e.target.value})} id='skills' className='loginInput' />
+                                <input type='text' required value={this.state.skills} onChange={(e) => this.setState({skills: e.target.value})} id='skills' className='loginInput' />
                                 <br />
                                 <label for='interests' className='loginInputTitle'>Interests</label>
-                                <input type='text' value={this.state.interests} onChange={(e) => this.setState({interests: e.target.value})} id='interests' className='loginInput' />
+                                <input type='text' required value={this.state.interests} onChange={(e) => this.setState({interests: e.target.value})} id='interests' className='loginInput' />
                                 <br />
                                 <label for='aboutSection' className='loginInputTitle'>About Me</label>
                                 <textarea type='text' value={this.state.aboutSection} onChange={(e) => this.setState({aboutSection: e.target.value})} id='aboutSection' className='loginTextarea' />

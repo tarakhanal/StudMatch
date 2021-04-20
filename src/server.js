@@ -42,6 +42,10 @@ app.post('/api/createAccount', async (req, res) => {
       interests: req.body.interests,
       profilePicture: req.body.profilePicture,
       aboutMe: req.body.aboutMe,
+      userArrayIndex: 0,
+      likedProfiles: {},
+      matches: [],
+      messageHistory: {}
     };
     const result = await users.insertOne(user);
     console.log(user)
@@ -75,7 +79,8 @@ app.post('/api/login', async (req, res) => {
         skills: 1,
         interests: 1,
         profilePicture: 1,
-        aboutMe: 1
+        aboutMe: 1,
+        _id: 1
       },
     };
     const cursor = users.find(query, options);

@@ -33,6 +33,7 @@ class App extends Component {
           <AppContainer
             logoutHandler={() => this.setState({user: null})}
             user={this.state.user}
+            displayMessageHandler={this.displayMessageHandler}
           />
         :
           <LoginPage
