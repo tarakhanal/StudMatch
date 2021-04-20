@@ -13,8 +13,8 @@ class App extends Component {
     }
   }
 
-  fetchLogin = (email) => {
-    this.setState({user: {email}})
+  fetchLogin = (user) => {
+    this.setState({user})
   }
 
   // toast notifications from package react-toastify
@@ -32,6 +32,7 @@ class App extends Component {
         {this.state.user ?
           <AppContainer
             logoutHandler={() => this.setState({user: null})}
+            user={this.state.user}
           />
         :
           <LoginPage

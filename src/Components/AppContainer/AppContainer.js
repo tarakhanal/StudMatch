@@ -8,7 +8,7 @@ export default class AppContainer extends Component {
     constructor() {
         super()
         this.state = {
-            navigationButtonSelected: 1
+            navigationButtonSelected: 1,
         }
     }
 
@@ -20,23 +20,23 @@ export default class AppContainer extends Component {
                 </div>
                 <div className='profileDisplayContainer'>
                     <div className='profileDisplayContentWrapper'>
-                        <img className='largeProfilePhoto' src={profilePhoto}/>
-                        <h1 className='headerText'>Marcus DeAngelo</h1>
-                        <p className='bodyText'>Computer Science | University of Akron</p>
+                        <img className='largeProfilePhoto' src={this.props.user.profilePicture}/>
+                        <h1 className='headerText'>{this.props.user.firstName} {this.props.user.lastName}</h1>
+                        <p className='bodyText'>{this.props.user.major} | {this.props.user.school}</p>
                         <p className='profileInfoTitle'>Skills</p>
                         <div className='badgeWrapper'>
-                            <span className='skillsBadge'>ReactJs</span>
-                            <span className='skillsBadge'>CSS</span>
-                            <span className='skillsBadge'>Javascript</span>
+                            {this.props.user.skills.map((value, index) => (
+                                <span className='skillsBadge'>{value}</span>
+                            ))}
                         </div>
                         <p className='profileInfoTitle'>Interests</p>
                         <div className='badgeWrapper'>
-                            <span className='interestsBadge'>Hiking</span>
-                            <span className='interestsBadge'>Video Games</span>
-                            <span className='interestsBadge'>Painting</span>
+                            {this.props.user.interests.map((value, index) => (
+                                <span className='interestsBadge'>{value}</span>
+                            ))}
                         </div>
                         <p className='profileInfoTitle'>About</p>
-                        <p className='profileDescriptionText'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                        <p className='profileDescriptionText'>{this.props.user.aboutMe}</p>
                     </div>
                 </div>
                 <div className='appNavigationContainer'>

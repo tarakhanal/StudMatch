@@ -53,6 +53,20 @@
     border-radius: 5px;
 }
 
+.loginTextarea {
+    resize: none;
+    display: inline-block;
+    width: calc(100% - 9px);
+    border: 1px solid var(--primary-color);
+    padding-left: 5px;
+    border-radius: 5px;
+    height: 100px;
+}
+
+.profilePictureInputPreview {
+    max-height: 200px;
+}
+
 .forgotPasswordText {
     font-family: var(--primary-font);
     color: var(--primary-color);
