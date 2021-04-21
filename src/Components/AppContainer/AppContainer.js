@@ -23,6 +23,7 @@ export default class AppContainer extends Component {
 
     componentDidMount() {
         this.setState({userToView: this.props.user, matchProfile: this.props.user})
+        this.getUserToView()
     }
 
     getUserToView = async () => {
@@ -139,7 +140,7 @@ export default class AppContainer extends Component {
                             </div>
                     : this.state.navigationButtonSelected === 2 ?
                         <div className='profileDisplayContentWrapper myProfileWrapper'>
-                            <img className='largeProfilePhoto' src={this.props.user.profilePicture}/>
+                            <img className='largeProfilePhoto' src={this.props.user.profilePicture} onClick={() => this.setState({displayMatchPopup: true})}/>
                             <h1 className='headerText'>{this.props.user.firstName} {this.props.user.lastName}</h1>
                             <p className='bodyText'>{this.props.user.major} | {this.props.user.school}</p>
                             <p className='profileInfoTitle'>Skills</p>
@@ -186,6 +187,30 @@ export default class AppContainer extends Component {
                                             <p className='chatText'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
                                         </div>
                                         <p className='outgoingChatTimeStamp'>2/12/2021 - 6:39 PM</p>
+                                    </div>
+                                    <div className='incomingChatWrapper'>
+                                        <div className='incomingChatContainer'>
+                                            <p className='chatText'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                                        </div>
+                                        <p className='incomingChatTimeStamp'>2/12/2021 - 6:39 PM</p>
+                                    </div>
+                                    <div className='incomingChatWrapper'>
+                                        <div className='incomingChatContainer'>
+                                            <p className='chatText'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                                        </div>
+                                        <p className='incomingChatTimeStamp'>2/12/2021 - 6:39 PM</p>
+                                    </div>
+                                    <div className='incomingChatWrapper'>
+                                        <div className='incomingChatContainer'>
+                                            <p className='chatText'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                                        </div>
+                                        <p className='incomingChatTimeStamp'>2/12/2021 - 6:39 PM</p>
+                                    </div>
+                                    <div className='incomingChatWrapper'>
+                                        <div className='incomingChatContainer'>
+                                            <p className='chatText'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                                        </div>
+                                        <p className='incomingChatTimeStamp'>2/12/2021 - 6:39 PM</p>
                                     </div>
                                 </div>
                             </div>

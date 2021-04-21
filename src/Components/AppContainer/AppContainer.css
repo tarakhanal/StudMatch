@@ -266,6 +266,7 @@
 .chatHistoryWrapper {
     align-self: end;
     padding-bottom: 10px;
+    overflow-y: auto;
 }
 
 .chatText {

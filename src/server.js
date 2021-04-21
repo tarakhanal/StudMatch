@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({extended: false, limit: '50mb'}))
 // app.use(express.urlencoded({limit: '50mb'}));
 app.use(express.static(path.join(__dirname, 'public')))
 
-const port = process.env.PORT || 4000
+const port = 4000
 app.listen(port, () => {
   console.log(`Listening on port ${port}...`)
 })
@@ -44,7 +44,7 @@ app.post('/api/createAccount', async (req, res) => {
       profilePicture: req.body.profilePicture,
       aboutMe: req.body.aboutMe,
       userArrayIndex: 0,
-      likedProfiles: {},
+      likedProfiles: [],
       matches: [],
       messageHistory: {}
     };
@@ -67,6 +67,25 @@ app.post('/api/createAccount', async (req, res) => {
 
   res.status(200).end()
 })
+
+app.post('/api/getNextUser', async (req, res) => {
+  let nextUserProfile = getNextUser(req.body.userId)
+  res.send(nextUserProfile)
+})
+
+app.post('/api/userDecision', async (req, res) => {
+  //Document user decision
+  //Check for match
+  //Call getNextUser -> this will return a user profile so do something like "let nextUser = getNextUser()"
+  //return match status and next user profile
+  console.log(req.body.loggedInUserId, req.body.ratedUserId, req.body.decision)
+  res.status(200)
+})
+
+getNextUser = (userId) => {
+  //get the next user
+  //return next user full profile
+}
 
 app.post('/api/login', async (req, res) => {
   try {
