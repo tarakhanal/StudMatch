@@ -50,12 +50,8 @@ app.post('/api/createAccount', async (req, res) => {
     };
 
     const result = await users.insertOne(user);
-    await profiles.update(
-      {}, // empty since there will be only one record
-       {
-         "$push": {"users": `${result.insertedId}`}
-       }
-      );
+
+    await profiles.insertOne({"userProfile": `${result.insertedId}`});
 
     console.log(user)
     console.log(
@@ -82,9 +78,24 @@ app.post('/api/userDecision', async (req, res) => {
   res.status(200)
 })
 
-getNextUser = (userId) => {
+const getNextUser = async (userId) => {
   //get the next user
-  //return next user full profile
+  try {
+  await client.connect()
+  const database = client.db();
+  const users = database.collection("users");
+  const profiles = database.collection("profiles");
+  const i = await users.find({"_id": `${userId}`}).userArrayIndex;
+  const userProfileId = await profiles.find()[i++].userProfile;
+  const userProfile = await users.find({"_id": `${userProfileId}`});
+  await users.updateOne({"_id": `${userId}`}, {"$set": {"userArrayIndex": `${i}`}});
+  console.log("User's profile: ", userProfile);
+  return userProfile;
+
+  } finally {
+    await client.close();
+  }
+
 }
 
 app.post('/api/login', async (req, res) => {
