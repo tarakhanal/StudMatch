@@ -29,6 +29,7 @@ app.post('/api/createAccount', async (req, res) => {
     await client.connect()
     const database = client.db();
     const users = database.collection("users");
+    const profiles = database.collection("profiles");
     // create a document to be inserted
     const user = {
       email: req.body.email,
@@ -47,7 +48,15 @@ app.post('/api/createAccount', async (req, res) => {
       matches: [],
       messageHistory: {}
     };
+
     const result = await users.insertOne(user);
+    await profiles.update(
+      {}, // empty since there will be only one record
+       {
+         "$push": {"users": `${result.insertedId}`}
+       }
+      );
+
     console.log(user)
     console.log(
       `${result.insertedCount} documents were inserted with the _id: ${result.insertedId}`,
