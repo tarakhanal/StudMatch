@@ -112,6 +112,7 @@
     border-radius: 3px;
     font-weight: 300;
     display: inline-block;
+    margin-top: 5px;
 }
 
 .profileDescriptionText {
@@ -261,12 +262,14 @@
 
 .chatHistoryContainer {
     display: grid;
+    grid-template-rows: auto 0px;
+    height: calc(100vh - 291px);
+    overflow-y: auto;
 }
 
 .chatHistoryWrapper {
     align-self: end;
     padding-bottom: 10px;
-    overflow-y: auto;
 }
 
 .chatText {

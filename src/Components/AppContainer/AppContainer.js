@@ -6,6 +6,7 @@ import { faUsers, faUser, faComments } from '@fortawesome/free-solid-svg-icons'
 import MDSpinner from 'react-md-spinner'
 import MatchPopup from '../MatchPopup/MatchPopup'
 import { AnimatePresence } from 'framer-motion'
+import openSocket from 'socket.io-client';
 
 export default class AppContainer extends Component {
     constructor() {
@@ -16,7 +17,7 @@ export default class AppContainer extends Component {
             chatProfiles: ['', ''],
             chatProfileSelected: 0,
             currentChatMessage: '',
-            displayMatchPopup: true,
+            displayMatchPopup: false,
             matchProfile: {}
         }
     }
@@ -24,6 +25,7 @@ export default class AppContainer extends Component {
     componentDidMount() {
         this.setState({userToView: this.props.user, matchProfile: this.props.user})
         this.getUserToView()
+        // this.subscribeToChat()
     }
 
     getUserToView = async () => {
@@ -42,6 +44,7 @@ export default class AppContainer extends Component {
             }
         })
         .then((response) => {
+            console.log(JSON.parse(response))
             this.setState({userToView: JSON.parse(response)})
         })
         .catch((error) => {
@@ -74,14 +77,64 @@ export default class AppContainer extends Component {
         })
     }
 
-    sendMessageHandler = () => {
-        this.props.displayMessageHandler(this.state.currentChatMessage)
+    sendMessageHandler = async () => {
+        await fetch(`http://localhost:4000/api/sendMessage`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({loggedInUserId: this.props.user._id, actionUserId: this.state.userToView._id, message: this.state.currentChatMessage})
+        })
+
         this.setState({currentChatMessage: ''})
     }
 
     handleChatNow = () => {
-        this.setState({displayMatchPopup: false, navigationButtonSelected: 3})
+        this.setState({displayMatchPopup: false})
+        this.openChatHandler()
     }
+
+    openChatHandler = () => {
+        this.setState({navigationButtonSelected: 3}, () => {
+            let bottomElement = document.getElementById('bottomOfMessages')
+            bottomElement.scrollIntoView()
+        })
+        console.log(this.props.user.messageHistory)
+    }
+
+    formatMessageTime = (timeSent) => {
+        // 2/12/2021 - 6:39 PM
+        let date = new Date(timeSent)
+        let month = date.getMonth() + 1
+        let day = date.getDate()
+        let year = date.getFullYear()
+        let hours = date.getHours()
+        let minutes = date.getMinutes()
+        let timePeriod = 'AM'
+
+        if (hours === 12) {
+            timePeriod = 'PM'
+        } else if (hours > 12 && hours !== 24) {
+            hours -= 12
+            timePeriod = 'PM'
+        } else if (hours === 24) {
+            hours -= 12
+        }
+
+        if (minutes < 10) {
+            minutes = `0${minutes}`
+        }
+
+        return `${month}/${day}/${year} - ${hours}:${minutes} ${timePeriod}`
+    }
+
+    socket = openSocket('http://localhost:4001')
+    
+    subscribeToChat = (cb) => {
+        this.socket.on('connection');
+        this.socket.emit('message', 'This is a message to the server');
+    }
+
 
     render() {
         return (
@@ -120,7 +173,7 @@ export default class AppContainer extends Component {
                     <div className='appNavigationButtonWrapper'>
                         <button className={this.state.navigationButtonSelected === 1 ? 'appNavigationButton appNavigationButtonSelected' : 'appNavigationButton'} onClick={() => this.setState({navigationButtonSelected: 1})}><FontAwesomeIcon icon={faUsers} /></button>
                         <button className={this.state.navigationButtonSelected === 2 ? 'appNavigationButton appNavigationButtonSelected' : 'appNavigationButton'} onClick={() => this.setState({navigationButtonSelected: 2})}><FontAwesomeIcon icon={faUser} /></button>
-                        <button className={this.state.navigationButtonSelected === 3 ? 'appNavigationButton appNavigationButtonSelected' : 'appNavigationButton'} onClick={() => this.setState({navigationButtonSelected: 3})}><FontAwesomeIcon icon={faComments} /></button>
+                        <button className={this.state.navigationButtonSelected === 3 ? 'appNavigationButton appNavigationButtonSelected' : 'appNavigationButton'} onClick={this.openChatHandler}><FontAwesomeIcon icon={faComments} /></button>
                     </div>
                     {this.state.navigationButtonSelected === 1 ?
                         this.state.userToView !== null ?
@@ -170,49 +223,24 @@ export default class AppContainer extends Component {
                             </div>
                             <div className='chatHistoryContainer'>
                                 <div className='chatHistoryWrapper'>
-                                    <div className='incomingChatWrapper'>
-                                        <div className='incomingChatContainer'>
-                                            <p className='chatText'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                                        </div>
-                                        <p className='incomingChatTimeStamp'>2/12/2021 - 6:39 PM</p>
-                                    </div>
-                                    <div className='outgoingChatWrapper'>
-                                        <div className='outgoingChatContainer'>
-                                            <p className='chatText'>Lorem Ipsum</p>
-                                        </div>
-                                        <p className='outgoingChatTimeStamp'>2/12/2021 - 6:39 PM</p>
-                                    </div>
-                                    <div className='outgoingChatWrapper'>
-                                        <div className='outgoingChatContainer'>
-                                            <p className='chatText'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                                        </div>
-                                        <p className='outgoingChatTimeStamp'>2/12/2021 - 6:39 PM</p>
-                                    </div>
-                                    <div className='incomingChatWrapper'>
-                                        <div className='incomingChatContainer'>
-                                            <p className='chatText'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                                        </div>
-                                        <p className='incomingChatTimeStamp'>2/12/2021 - 6:39 PM</p>
-                                    </div>
-                                    <div className='incomingChatWrapper'>
-                                        <div className='incomingChatContainer'>
-                                            <p className='chatText'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                                        </div>
-                                        <p className='incomingChatTimeStamp'>2/12/2021 - 6:39 PM</p>
-                                    </div>
-                                    <div className='incomingChatWrapper'>
-                                        <div className='incomingChatContainer'>
-                                            <p className='chatText'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                                        </div>
-                                        <p className='incomingChatTimeStamp'>2/12/2021 - 6:39 PM</p>
-                                    </div>
-                                    <div className='incomingChatWrapper'>
-                                        <div className='incomingChatContainer'>
-                                            <p className='chatText'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                                        </div>
-                                        <p className='incomingChatTimeStamp'>2/12/2021 - 6:39 PM</p>
-                                    </div>
+                                    {this.props.user.messageHistory?.map((message, index) => (
+                                        message.sentBy === this.props.user._id ?
+                                            <div className='outgoingChatWrapper'>
+                                                <div className='outgoingChatContainer'>
+                                                    <p className='chatText'>{message.message}</p>
+                                                </div>
+                                                <p className='outgoingChatTimeStamp'>{this.formatMessageTime(message.timeSent)}</p>
+                                            </div>
+                                        :
+                                            <div className='incomingChatWrapper'>
+                                                <div className='incomingChatContainer'>
+                                                    <p className='chatText'>{message.message}</p>
+                                                </div>
+                                                <p className='incomingChatTimeStamp'>{this.formatMessageTime(message.timeSent)}</p>
+                                            </div>
+                                    ))}
                                 </div>
+                                <div id='bottomOfMessages'/>
                             </div>
                             <div className='chatInputContainer'>
                                 <input value={this.state.currentChatMessage} onChange={(e) => this.setState({currentChatMessage: e.target.value})} className='chatInput' />

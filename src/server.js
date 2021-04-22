@@ -13,6 +13,8 @@ const client = new MongoClient(uri, { useNewUrlParser: true });
 
 const app = express()
 
+const server = require("http").createServer(app)
+
 app.use(express.json({limit: '50mb'}))
 app.use(cors())
 app.use(bodyParser.urlencoded({extended: false, limit: '50mb'}))
@@ -47,14 +49,14 @@ app.post('/api/createAccount', async (req, res) => {
       userArrayIndex: 0,
       likedProfiles: [],
       matches: [],
-      messageHistory: {}
+      messageHistory: []
     };
 
     const result = await users.insertOne(user);
 
     await profiles.insertOne({"userProfile": `${result.insertedId}`});
 
-    console.log(user)
+    // console.log(user)
     console.log(
       `${result.insertedCount} documents were inserted with the _id: ${result.insertedId}`,
     );
@@ -67,7 +69,8 @@ app.post('/api/createAccount', async (req, res) => {
 
 app.post('/api/getNextUser', async (req, res) => {
   let nextUserProfile = await getNextUser(req.body.userId)
-  res.send(nextUserProfile)
+  console.log('Get next user: ', nextUserProfile)
+  res.send(nextUserProfile).end()
 })
 
 app.post('/api/userDecision', async (req, res) => {
@@ -91,8 +94,6 @@ app.post('/api/userDecision', async (req, res) => {
 
   let nextUser = getNextUser();
   res.send(nextUser).end()
-  //return match status and next user profile
-  // console.log(req.body.loggedInUserId, req.body.ratedUserId, req.body.decision)
 })
 
 const getNextUser = async (userId) => {
@@ -102,20 +103,63 @@ const getNextUser = async (userId) => {
   const database = client.db();
   const users = database.collection("users");
   const profiles = database.collection("profiles");
-  // let i = await users.find({"_id": ${userId}}).userArrayIndex;
+  // let i = await users.find({"_id": `${userId}`}).userArrayIndex;
   let i = await users.findOne({_id: ObjectId(`${userId}`)});
   console.log('Index object value: ', i.userArrayIndex)
-  const profile = await profiles.find();
-  const userProfileId = profile[i.userArrayIndex].userProfile;
+  const userProfileId = await profiles.find()[i.userArrayIndex].userProfile;
   const userProfile = await users.findOne({"_id": `${userProfileId}`});
   await users.updateOne({"_id": `${userId}`}, {"$set": {"userArrayIndex": `${i.userArrayIndex + 1}`}});
   // console.log("User's profile: ", userProfile);
-  return i;
+  return userProfile;
 
   } finally {
     // await client.close();
   }
 }
+
+app.post('/api/sendMessage', async (req, res) => {
+  let loggedInUserId = req.body.loggedInUserId
+  let actionUserId = req.body.actionUserId
+  let message = req.body.message
+  let formattedMessage = {
+    sentBy: loggedInUserId,
+    receivedBy: actionUserId,
+    timeSent: `${new Date()}`,
+    message
+  }
+  try {
+    await client.connect()
+    const database = client.db()
+    const users = database.collection("users")
+    // db.posts.update({_id: <post id>}, {$push: {comments: {comment: 'hello...', user: user}});
+    await users.updateOne({_id: ObjectId(`${loggedInUserId}`)},
+    {
+      "$push": {
+        "messageHistory": formattedMessage
+      }
+    },
+    { upsert: true }
+    )
+  } finally {
+    // await client.close()
+  }
+  console.log('insert complete, responding')
+  res.status(200).end()
+})
+
+app.post('/api/messageStream', async (req, res) => {
+  try {
+    await client.connect()
+    const database = client.db()
+    const users = database.collection("users")
+    const pipeline = [ { "$match": { "matchHistory": { $lt: 15 } } } ]
+    const changeStream = collection.watch(pipeline);
+  } catch {
+    res.status(400).end()
+  } finally {
+    res.status(200).end()
+  }
+})
 
 app.post('/api/login', async (req, res) => {
   try {
@@ -138,9 +182,11 @@ app.post('/api/login', async (req, res) => {
         interests: 1,
         profilePicture: 1,
         aboutMe: 1,
-        _id: 1
+        _id: 1,
+        messageHistory: 1
       },
     };
+    console.log(users.find())
     const cursor = users.find(query, options);
     // print a message if no documents were found
     if ((await cursor.count()) === 0) {
@@ -150,57 +196,27 @@ app.post('/api/login', async (req, res) => {
     let userData = {}
     // replace console.dir with callback to access individual elements
     await cursor.forEach((doc) => userData = doc);
-    res.send(userData)
     console.log(userData)
+    res.send(userData).end()
   } finally {
     // await client.close();
   }
   res.status(200).end()
 })
 
-// app.post('/api/login/more-info', async (req, res) => {
-//   try {
-//       const user = {
-//       firstName: "Tara",
-//       lastName: "Khanal",
-//       email: "tara@test.com",
-//       password: "pwd123",
-//       major: "Computer Sciecne",
-//       school: "The University of Akron",
-//       skills: [ "Hiking", "Video Games", "Painting", "Snowboarding", "Basketball" ],
-//       profilePicture: "https://via.placeholder.com/150",
-//       aboutMe: "My name is Tara"
-//       };
+const io = require('socket.io')(server, {
+  cors: { origin: "*" }
+})
 
-//       await client.connect();
+io.on('connection', (socket) => {
+  console.log('a user connected')
 
-//       const database = client.db("test");
-//       const users = database.collection("users");
+  socket.on('message', (message) => {
+    console.log(message)
+    io.emit('message', message)
+  })
+})
 
-//       const result = await users.insertOne(user);
-
-//       console.log(`${result.insertedCount} documents were inserted with the _id: ${result.insertedId}`);
-//       console.log("User info is successfully stored!");
-//       } finally {
-//       await client.close();
-//   }
-// });
-
-// app.get("/userInfo", async (req, res) => {
-
-//   try{
-//       await client.connect();
-//       const database = client.db("test");
-//       const users = database.collection("users");
-//       const cursor = users.find();
-  
-//       // prints each field in the console
-//       cursor.forEach((doc, err) =>{
-//           console.log(doc);
-//       });
-//       res.send(`Your info: ${cursor}`);
-
-//   } finally {
-//       await client.close();
-//   }
-// });
+server.listen(4001, () => {
+  console.log('websocket server is running on port 4001')
+})
