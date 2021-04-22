@@ -4,11 +4,12 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const path = require('path')
 const { MongoClient } = require('mongodb')
+let ObjectId = require('mongodb').ObjectID
 
 const uri =
   "mongodb://127.0.0.1:27017";
 // Create a new MongoClient
-const client = new MongoClient(uri);
+const client = new MongoClient(uri, { useNewUrlParser: true });
 
 const app = express()
 
@@ -58,24 +59,40 @@ app.post('/api/createAccount', async (req, res) => {
       `${result.insertedCount} documents were inserted with the _id: ${result.insertedId}`,
     );
   } finally {
-    // await client.close();
+    await client.close();
   }
 
   res.status(200).end()
 })
 
 app.post('/api/getNextUser', async (req, res) => {
-  let nextUserProfile = getNextUser(req.body.userId)
+  let nextUserProfile = await getNextUser(req.body.userId)
   res.send(nextUserProfile)
 })
 
 app.post('/api/userDecision', async (req, res) => {
   //Document user decision
-  //Check for match
-  //Call getNextUser -> this will return a user profile so do something like "let nextUser = getNextUser()"
+  const userDecision = req.body.decision;
+  await client.connect();
+  const database = client.db();
+  const users = database.collection("users");
+
+  if (userDecision) {
+    await users.updateOne({_id: ObjectId(`${req.body.loggedInUserId}`)}, {"$push": {"likedProfiles": `${req.body.ratedUserId}`}});
+    const likedProfiles = await users.find({_id: ObjectId(`${req.body.ratedUserId}`)}).likedProfiles;
+    likedProfiles.forEach(async (user) => {
+      if(user == req.body.loggedInUserId) {
+        // it's a match!
+        await users.updateOne({_id: ObjectId(`${req.body.loggedInUserId}`)}, {"$push": {"matches": `${req.body.ratedUserId}`}});
+        await users.updateOne({_id: ObjectId(`${req.body.ratedUserId}`)}, {"$push": {"matches": `${req.body.loggedInUserId}`}});
+      }
+    })
+  }
+
+  let nextUser = getNextUser();
+  res.send(nextUser).end()
   //return match status and next user profile
-  console.log(req.body.loggedInUserId, req.body.ratedUserId, req.body.decision)
-  res.status(200)
+  // console.log(req.body.loggedInUserId, req.body.ratedUserId, req.body.decision)
 })
 
 const getNextUser = async (userId) => {
@@ -85,17 +102,19 @@ const getNextUser = async (userId) => {
   const database = client.db();
   const users = database.collection("users");
   const profiles = database.collection("profiles");
-  const i = await users.find({"_id": `${userId}`}).userArrayIndex;
-  const userProfileId = await profiles.find()[i++].userProfile;
-  const userProfile = await users.find({"_id": `${userProfileId}`});
-  await users.updateOne({"_id": `${userId}`}, {"$set": {"userArrayIndex": `${i}`}});
-  console.log("User's profile: ", userProfile);
-  return userProfile;
+  // let i = await users.find({"_id": ${userId}}).userArrayIndex;
+  let i = await users.findOne({_id: ObjectId(`${userId}`)});
+  console.log('Index object value: ', i.userArrayIndex)
+  const profile = await profiles.find();
+  const userProfileId = profile[i.userArrayIndex].userProfile;
+  const userProfile = await users.findOne({"_id": `${userProfileId}`});
+  await users.updateOne({"_id": `${userId}`}, {"$set": {"userArrayIndex": `${i.userArrayIndex + 1}`}});
+  // console.log("User's profile: ", userProfile);
+  return i;
 
   } finally {
-    await client.close();
+    // await client.close();
   }
-
 }
 
 app.post('/api/login', async (req, res) => {
